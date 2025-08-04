@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vaccination Schedule - ImmunTracker</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <i class="fas fa-shield-alt"></i>
+                ImmunTracker
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="register-child.html">Register Child</a></li>
+                <li><a href="view-records.html">View Records</a></li>
+                <li><a href="schedule.html">Schedule</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="education.html">Education</a></li>
+                <li><a href="#" id="logoutBtn">Logout</a></li>
+            </ul>
+            <button class="nav-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <section class="section">
+        <div class="container">
+            <div class="flex-between mb-4">
+                <div>
+                    <h1 style="font-size: 2.5rem; font-weight: 700; color: var(--gray-800); margin-bottom: 0.5rem;">
+                        Vaccination Schedule
+                    </h1>
+                    <p style="font-size: 1.125rem; color: var(--gray-600);">
+                        Track and manage vaccination schedules for all children
+                    </p>
+                </div>
+                <div class="flex" style="gap: 0.5rem;">
+                    <button id="printScheduleBtn" class="btn btn-secondary">
+                        <i class="fas fa-print"></i>
+                        Print Schedule
+                    </button>
+                    <button id="recordVaccinationBtn" class="btn btn-primary">
+                        <i class="fas fa-syringe"></i>
+                        Record Vaccination
+                    </button>
+                </div>
+            </div>
+
+            <!-- Child Selector -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="flex" style="gap: 1rem; align-items: center; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 200px;">
+                            <label for="childSelect" class="form-label">Select Child:</label>
+                            <select id="childSelect" class="form-control">
+                                <option value="">Loading children...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label" style="opacity: 0;">Filter</label>
+                            <div class="flex" style="gap: 0.5rem;">
+                                <button id="showAllBtn" class="btn btn-outline active">All</button>
+                                <button id="showDueBtn" class="btn btn-outline">Due</button>
+                                <button id="showOverdueBtn" class="btn btn-outline">Overdue</button>
+                                <button id="showCompletedBtn" class="btn btn-outline">Completed</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Schedule Content -->
+            <div id="scheduleContent">
+                <!-- Content will be loaded dynamically -->
+            </div>
+
+            <!-- No Child Selected -->
+            <div id="noChildSelected" class="card">
+                <div class="card-body text-center" style="padding: 3rem;">
+                    <i class="fas fa-calendar-alt" style="font-size: 4rem; color: var(--gray-300); margin-bottom: 1rem;"></i>
+                    <h3 style="color: var(--gray-600); margin-bottom: 1rem;">Select a Child</h3>
+                    <p style="color: var(--gray-500); margin-bottom: 2rem;">
+                        Choose a child from the dropdown above to view their vaccination schedule.
+                    </p>
+                    <a href="register-child.html" class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        Register New Child
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Record Vaccination Modal -->
+    <div id="vaccinationModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Record Vaccination</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="vaccinationForm">
+                    <div class="form-group">
+                        <label for="vaccineSelect" class="form-label">Vaccine *</label>
+                        <select id="vaccineSelect" name="vaccine" class="form-control" required>
+                            <option value="">Select vaccine...</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dateAdministered" class="form-label">Date Administered *</label>
+                            <input type="date" id="dateAdministered" name="dateAdministered" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="batchNumber" class="form-label">Batch Number</label>
+                            <input type="text" id="batchNumber" name="batchNumber" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="administeredBy" class="form-label">Administered By</label>
+                            <input type="text" id="administeredBy" name="administeredBy" class="form-control" placeholder="Doctor/Nurse name">
+                        </div>
+                        <div class="form-group">
+                            <label for="location" class="form-label">Location</label>
+                            <input type="text" id="location" name="location" class="form-control" placeholder="Clinic/Hospital name">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes" class="form-label">Notes</label>
+                        <textarea id="notes" name="notes" class="form-control" rows="3" placeholder="Any additional notes or reactions..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline modal-close">Cancel</button>
+                <button type="submit" form="vaccinationForm" class="btn btn-primary" id="saveVaccinationBtn">
+                    <i class="fas fa-save"></i>
+                    Save Vaccination
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+    <script src="config.js"></script>
+    <script src="auth.js"></script>
+    <script src="firebase-utils.js"></script>
+    <script src="utils.js"></script>
+    <script>
+        let allChildren = [];
+        let selectedChild = null;
+        let currentSchedule = [];
+        let currentFilter = 'all';
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check authentication
+            if (!auth.requireAuth()) {
+                return;
+            }
+            
+            // Setup logout functionality
+            document.getElementById('logoutBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                auth.logout();
+            });
+            
+            loadChildren();
+            setupEventListeners();
+            
+            // Check if child ID is in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const childId = urlParams.get('child');
+            if (childId) {
+                setTimeout(() => selectChildById(childId), 1000);
+            }
+        });
+        
+        function setupEventListeners() {
+            document.getElementById('childSelect').addEventListener('change', handleChildSelection);
+            document.getElementById('printScheduleBtn').addEventListener('click', printSchedule);
+            document.getElementById('recordVaccinationBtn').addEventListener('click', openVaccinationModal);
+            
+            // Filter buttons
+            document.getElementById('showAllBtn').addEventListener('click', () => setFilter('all'));
+            document.getElementById('showDueBtn').addEventListener('click', () => setFilter('due'));
+            document.getElementById('showOverdueBtn').addEventListener('click', () => setFilter('overdue'));
+            document.getElementById('showCompletedBtn').addEventListener('click', () => setFilter('completed'));
+            
+            // Modal functionality
+            document.addEventListener('click', (e) => {
+                const modal = document.getElementById('vaccinationModal');
+                if (e.target.classList.contains('modal-close') || e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+            
+            // Vaccination form
+            document.getElementById('vaccinationForm').addEventListener('submit', handleVaccinationSubmit);
+            
+            // Set max date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('dateAdministered').setAttribute('max', today);
+        }
+        
+        async function loadChildren() {
+            const childSelect = document.getElementById('childSelect');
+            
+            try {
+                const result = await childOperations.getAllChildren();
+                
+                if (result.success) {
+                    allChildren = result.data;
+                    
+                    if (allChildren.length === 0) {
+                        childSelect.innerHTML = '<option value="">No children registered</option>';
+                        return;
+                    }
+                    
+                    childSelect.innerHTML = '<option value="">Select a child...</option>' +
+                        allChildren.map(child => 
+                            `<option value="${child.id}">${child.firstName} ${child.lastName}</option>`
+                        ).join('');
+                } else {
+                    throw new Error(result.error || 'Failed to load children');
+                }
+            } catch (error) {
+                console.error('Error loading children:', error);
+                childSelect.innerHTML = '<option value="">Error loading children</option>';
+            }
+        }
+        
+        function selectChildById(childId) {
+            const childSelect = document.getElementById('childSelect');
+            childSelect.value = childId;
+            handleChildSelection();
+        }
+        
+        async function handleChildSelection() {
+            const childSelect = document.getElementById('childSelect');
+            const childId = childSelect.value;
+            
+            if (!childId) {
+                selectedChild = null;
+                showNoChildSelected();
+                return;
+            }
+            
+            selectedChild = allChildren.find(child => child.id === childId);
+            if (!selectedChild) return;
+            
+            await loadChildSchedule();
+        }
+        
+        async function loadChildSchedule() {
+            const scheduleContent = document.getElementById('scheduleContent');
+            const noChildSelected = document.getElementById('noChildSelected');
+            
+            scheduleContent.innerHTML = '<div class="loading-container"><div class="loading"></div> Loading schedule...</div>';
+            noChildSelected.style.display = 'none';
+            
+            try {
+                // Get child's vaccinations
+                const vaccinationsResult = await vaccinationOperations.getChildVaccinations(selectedChild.id);
+                const vaccinations = vaccinationsResult.success ? vaccinationsResult.data : [];
+                
+                // Generate schedule
+                const schedule = vaccineSchedule.generateSchedule(selectedChild.dateOfBirth);
+                
+                // Mark completed vaccinations
+                schedule.forEach(scheduleItem => {
+                    const vaccination = vaccinations.find(v => 
+                        v.vaccine === scheduleItem.name && v.administered
+                    );
+                    if (vaccination) {
+                        scheduleItem.administered = true;
+                        scheduleItem.dateAdministered = vaccination.dateAdministered;
+                        scheduleItem.administeredBy = vaccination.administeredBy;
+                        scheduleItem.location = vaccination.location;
+                        scheduleItem.status = 'completed';
+                    }
+                });
+                
+                currentSchedule = schedule;
+                renderSchedule();
+                
+            } catch (error) {
+                console.error('Error loading schedule:', error);
+                scheduleContent.innerHTML = `
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <i class="fas fa-exclamation-triangle" style="color: var(--error-500); font-size: 2rem; margin-bottom: 1rem;"></i>
+                            <p style="color: var(--error-500);">Failed to load schedule: ${error.message}</p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        function setFilter(filter) {
+            currentFilter = filter;
+            
+            // Update button states
+            document.querySelectorAll('[id^="show"][id$="Btn"]').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`show${filter.charAt(0).toUpperCase() + filter.slice(1)}Btn`).classList.add('active');
+            
+            renderSchedule();
+        }
+        
+        function renderSchedule() {
+            const scheduleContent = document.getElementById('scheduleContent');
+            
+            if (!selectedChild || !currentSchedule.length) {
+                showNoChildSelected();
+                return;
+            }
+            
+            // Filter schedule based on current filter
+            let filteredSchedule = currentSchedule;
+            if (currentFilter !== 'all') {
+                filteredSchedule = currentSchedule.filter(item => {
+                    if (currentFilter === 'completed') return item.administered;
+                    if (currentFilter === 'due') return item.status === 'due';
+                    if (currentFilter === 'overdue') return item.status === 'overdue';
+                    return true;
+                });
+            }
+            
+            if (filteredSchedule.length === 0) {
+                scheduleContent.innerHTML = `
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <i class="fas fa-filter" style="color: var(--gray-300); font-size: 2rem; margin-bottom: 1rem;"></i>
+                            <p style="color: var(--gray-500);">No vaccinations found for the selected filter.</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            scheduleContent.innerHTML = `
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-user" style="color: var(--primary-500); margin-right: 0.5rem;"></i>
+                            ${selectedChild.firstName} ${selectedChild.lastName}
+                        </h3>
+                        <p style="color: var(--gray-600); margin: 0;">
+                            Born: ${formatDate(selectedChild.dateOfBirth)} • Age: ${calculateAge(selectedChild.dateOfBirth)}
+                        </p>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Vaccine</th>
+                                        <th>Due Date</th>
+                                        <th>Status</th>
+                                        <th>Date Given</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${filteredSchedule.map(vaccine => `
+                                        <tr>
+                                            <td>
+                                                <strong>${vaccine.name}</strong><br>
+                                                <small style="color: var(--gray-600);">${vaccine.description}</small>
+                                            </td>
+                                            <td>${formatDate(vaccine.dueDate)}</td>
+                                            <td>
+                                                <span class="badge badge-${getStatusColor(vaccine.status)}">
+                                                    ${vaccine.status.toUpperCase()}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                ${vaccine.administered ? 
+                                                    formatDate(vaccine.dateAdministered) : 
+                                                    '<span style="color: var(--gray-400);">Not given</span>'
+                                                }
+                                            </td>
+                                            <td>
+                                                ${!vaccine.administered ? 
+                                                    `<button onclick="recordVaccination('${vaccine.name}')" class="btn btn-primary" style="font-size: 0.8rem; padding: 0.5rem;">
+                                                        <i class="fas fa-syringe"></i>
+                                                        Record
+                                                    </button>` :
+                                                    `<button onclick="viewVaccinationDetails('${vaccine.name}')" class="btn btn-outline" style="font-size: 0.8rem; padding: 0.5rem;">
+                                                        <i class="fas fa-eye"></i>
+                                                        View
+                                                    </button>`
+                                                }
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function showNoChildSelected() {
+            const scheduleContent = document.getElementById('scheduleContent');
+            const noChildSelected = document.getElementById('noChildSelected');
+            
+            scheduleContent.innerHTML = '';
+            noChildSelected.style.display = 'block';
+        }
+        
+        function openVaccinationModal() {
+            if (!selectedChild) {
+                alert('Please select a child first');
+                return;
+            }
+            
+            const modal = document.getElementById('vaccinationModal');
+            const vaccineSelect = document.getElementById('vaccineSelect');
+            
+            // Populate vaccine options with pending vaccines
+            const pendingVaccines = currentSchedule.filter(v => !v.administered);
+            vaccineSelect.innerHTML = '<option value="">Select vaccine...</option>' +
+                pendingVaccines.map(vaccine => 
+                    `<option value="${vaccine.name}">${vaccine.name} - ${vaccine.description}</option>`
+                ).join('');
+            
+            modal.style.display = 'flex';
+        }
+        
+        function recordVaccination(vaccineName) {
+            const modal = document.getElementById('vaccinationModal');
+            const vaccineSelect = document.getElementById('vaccineSelect');
+            
+            vaccineSelect.value = vaccineName;
+            modal.style.display = 'flex';
+        }
+        
+        async function handleVaccinationSubmit(e) {
+            e.preventDefault();
+            
+            const form = e.target;
+            const formData = new FormData(form);
+            const saveBtn = document.getElementById('saveVaccinationBtn');
+            
+            const originalText = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<div class="loading"></div> Saving...';
+            saveBtn.disabled = true;
+            
+            try {
+                const vaccinationData = {
+                    vaccine: formData.get('vaccine'),
+                    dateAdministered: formData.get('dateAdministered'),
+                    batchNumber: formData.get('batchNumber'),
+                    administeredBy: formData.get('administeredBy'),
+                    location: formData.get('location'),
+                    notes: formData.get('notes'),
+                    administered: true
+                };
+                
+                const result = await vaccinationOperations.addVaccination(selectedChild.id, vaccinationData);
+                
+                if (result.success) {
+                    showSuccessMessage('Vaccination recorded successfully!');
+                    document.getElementById('vaccinationModal').style.display = 'none';
+                    form.reset();
+                    await loadChildSchedule(); // Reload schedule
+                } else {
+                    throw new Error(result.error || 'Failed to record vaccination');
+                }
+            } catch (error) {
+                console.error('Error recording vaccination:', error);
+                alert(`Failed to record vaccination: ${error.message}`);
+            } finally {
+                saveBtn.innerHTML = originalText;
+                saveBtn.disabled = false;
+            }
+        }
+        
+        function printSchedule() {
+            if (!selectedChild || !currentSchedule.length) {
+                alert('Please select a child first');
+                return;
+            }
+            
+            const printContent = `
+                <html>
+                <head>
+                    <title>Vaccination Schedule - ${selectedChild.firstName} ${selectedChild.lastName}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        .header { text-align: center; margin-bottom: 30px; }
+                        .child-info { background: #f5f5f5; padding: 15px; margin-bottom: 20px; }
+                        table { width: 100%; border-collapse: collapse; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                        th { background-color: #f2f2f2; }
+                        .completed { background-color: #d4edda; }
+                        .due { background-color: #fff3cd; }
+                        .overdue { background-color: #f8d7da; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>Vaccination Schedule</h1>
+                        <h2>${selectedChild.firstName} ${selectedChild.lastName}</h2>
+                    </div>
+                    <div class="child-info">
+                        <p><strong>Date of Birth:</strong> ${formatDate(selectedChild.dateOfBirth)}</p>
+                        <p><strong>Age:</strong> ${calculateAge(selectedChild.dateOfBirth)}</p>
+                        <p><strong>Generated:</strong> ${new Date().toLocaleDateString()}</p>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Vaccine</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                                <th>Date Given</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${currentSchedule.map(vaccine => `
+                                <tr class="${vaccine.status}">
+                                    <td>${vaccine.name}<br><small>${vaccine.description}</small></td>
+                                    <td>${formatDate(vaccine.dueDate)}</td>
+                                    <td>${vaccine.status.toUpperCase()}</td>
+                                    <td>${vaccine.administered ? formatDate(vaccine.dateAdministered) : 'Not given'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </body>
+                </html>
+            `;
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            printWindow.print();
+        }
+        
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+        
+        function calculateAge(birthDate) {
+            const birth = new Date(birthDate);
+            const today = new Date();
+            let age = today.getFullYear() - birth.getFullYear();
+            const monthDiff = today.getMonth() - birth.getMonth();
+            
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+                age--;
+            }
+            
+            if (age === 0) {
+                let months = monthDiff;
+                if (today.getDate() < birth.getDate()) {
+                    months--;
+                }
+                return `${months} month${months !== 1 ? 's' : ''}`;
+            }
+            
+            return `${age} year${age !== 1 ? 's' : ''}`;
+        }
+        
+        function getStatusColor(status) {
+            switch (status) {
+                case 'completed':
+                    return 'success';
+                case 'due':
+                    return 'warning';
+                case 'overdue':
+                    return 'error';
+                default:
+                    return 'secondary';
+            }
+        }
+        
+        function showSuccessMessage(message) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #10b981;
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 0.5rem;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+                z-index: 1000;
+            `;
+            toast.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+    </script>
+    
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+            max-width: 600px;
+            width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--gray-500);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+        
+        .modal-close:hover {
+            background: var(--gray-100);
+            color: var(--gray-700);
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            background: var(--gray-50);
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+        
+        .btn.active {
+            background: var(--primary-600);
+            color: white;
+        }
+        
+        .loading-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            color: var(--gray-600);
+        }
+    </style>
+</body>
+</html>

@@ -185,7 +185,7 @@
                     }
                 } catch (error) {
                     console.error('Registration error:', error);
-                    utils.showError(document.querySelector('.card-body'), `Registration failed: ${error.message}`);
+                    showError(document.querySelector('.card-body'), `Registration failed: ${error.message}`);
                 } finally {
                     // Restore button state
                     registerBtn.innerHTML = originalText;
@@ -193,6 +193,53 @@
                 }
             });
         });
+        
+        function showError(element, message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.style.cssText = `
+                background: #fef2f2;
+                border: 1px solid #fecaca;
+                color: #dc2626;
+                padding: 1rem;
+                border-radius: 0.5rem;
+                margin-bottom: 1rem;
+            `;
+            errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
+            
+            // Remove existing error messages
+            const existingError = element.querySelector('.error-message');
+            if (existingError) {
+                existingError.remove();
+            }
+            
+            errorDiv.className = 'error-message';
+            element.insertBefore(errorDiv, element.firstChild);
+        }
+        
+        function validateForm(form) {
+            const inputs = form.querySelectorAll('[required]');
+            let isValid = true;
+            
+            inputs.forEach(input => {
+                if (!input.value.trim()) {
+                    input.style.borderColor = '#dc2626';
+                    isValid = false;
+                } else {
+                    input.style.borderColor = '';
+                }
+            });
+            
+            return isValid;
+        }
+        
+        function formatPhoneNumber(phone) {
+            const cleaned = phone.replace(/\D/g, '');
+            const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+            if (match) {
+                return `(${match[1]}) ${match[2]}-${match[3]}`;
+            }
+            return phone;
+        }
     </script>
 </body>
 </html>
